@@ -5,10 +5,6 @@
       selection
       .transition()
       .duration(500)
-      // .delay( function (d, i) {
-      //   return i * 25;
-      // })
-      // .ease('elastic')
       .attr('cx', function (d) {
         return xScale(d.x);
       })
@@ -29,6 +25,28 @@
       .duration(500);
     }
 
+    function plainTransition (selection, dur) {
+      selection
+      .transition()
+      .duration(dur)
+      .attr('cx', function (d) {
+        return xScale(d.x);
+      })
+      .attr('cy', function (d) {
+        return yScale(d.y);
+      })
+      .attr('r', function (d) {
+        return d.r;
+      })
+      .style('fill', 'yellow')
+      .transition();
+    }
+
+    function newData(datum) {
+      datum.x = Math.round(Math.random() * 100),
+      datum.y = Math.round(Math.random() * 100),
+      datum.r = Math.round(5 + Math.random() * 10);
+    }
 
     var dataset = _.map(_.range(25), function(i) {
       return {
@@ -40,13 +58,18 @@
     dataset.push({x: 0, y: 0, r: 0});
 
     $("#update").click(function() {
-      _.each( dataset, function(datum) {
-        datum.x = Math.round(Math.random() * 100);
-        datum.y = Math.round(Math.random() * 100);
-        datum.r = Math.round(5 + Math.random() * 10);
-      })
+      svg.selectAll('circle')
+        .filter(function (d) {
+          return d.x < 50;
+        })
+        .each(newData)
+        .call(plainTransition, 2000);
 
       svg.selectAll('circle')
+        .filter(function (d) {
+          return d.x > 50;
+        })
+        .each(newData)
         .call(steppedTransition);
     })
 
@@ -112,20 +135,6 @@
       })
       .attr('r', function(d) {
         return d.r;
-      })
-      .on('mouseover', function(d) {
-        // d3.select(this).style('fill', 'red');
-        d3.select(this).classed('active', true);
-      })
-      .on('mouseout', function(d) {
-        // d3.select(this).style('fill', 'teal');
-        d3.select(this).classed('active', false);
-      })
-      .on('mousedown', function(d) {
-        d3.select(this).attr('r', d.r * 2);
-      })
-      .on('mouseup', function(d) {
-        d3.select(this).attr('r', d.r);
       });
 
   });
